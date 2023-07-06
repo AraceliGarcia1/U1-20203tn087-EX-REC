@@ -1,69 +1,60 @@
 console.log("hola");
-const producto={
-    nombre:"",
-    precio:0.0,
-    cantidad:0,
-    generarTotalProducto:()=>{
-        let totalP=precio*cantidad;
-        return totalP;
-    } 
-    
-}
+const producto = {
+  nombre: "",
+  precio: 0.0,
+  cantidad: 0,
+  generarTotalProducto: function() {
+    let totalP = this.precio * this.cantidad;
+    return totalP;
+  }
+};
 
-var addProduct = document.getElementById("add");
+const carrito = {
+  productos: [],
+  folio: getRandomInt(1000).toString(),
+  agregarProducto: function(producto) {
+    this.productos.push(producto);
+  },
+  calcularTotal: function() {
+    let total = 0;
+    for (let i = 0; i < this.productos.length; i++) {
+      total += this.productos[i].generarTotalProducto();
+    }
+    return total;
+  },
+  calcularTotalConIVA: function() {
+    const iva = 0.16; // 16% de impuesto
+    const totalSinIVA = this.calcularTotal();
+    const totalConIVA = totalSinIVA * (1 + iva);
+    return totalConIVA;
+  }
+};
 
-let productos=[]
-addProduct.addEventListener("click",()=>{
-    console.log("recuperando...")
-    producto.nombre=document.getElementById("nombre").value;
-    producto.precio=document.getElementById("precio").value;
-    producto.cantidad=document.getElementById("cantidad").value;
-    productos.push(producto)
-    console.log(productos) 
-    console.log(producto)      
+const addProduct = document.getElementById("add");
+addProduct.addEventListener("click", () => {
+  const nuevoProducto = Object.create(producto);
+  nuevoProducto.nombre = document.getElementById("nombre").value;
+  nuevoProducto.precio = parseFloat(document.getElementById("precio").value);
+  nuevoProducto.cantidad = parseInt(document.getElementById("cantidad").value);
+  carrito.agregarProducto(nuevoProducto);
+  console.log(carrito.productos);
+  console.log(nuevoProducto);
 });
 
-var closeCar=document.getElementById("close")
+const closeCar = document.getElementById("close");
+closeCar.addEventListener("click", () => {
+  const total = carrito.calcularTotal();
+  const totalConIVA = carrito.calcularTotalConIVA();
+  console.log("Total: ", total);
+  console.log("Total con IVA: ", totalConIVA);
+
+  const subtotalInput = document.getElementById("subtotal");
+  subtotalInput.value = carrito.calcularTotal();
+
+  const totalInput = document.getElementById("total");
+  totalInput.value = carrito.calcularTotalConIVA();
+});
 
 function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  }
-
-const prototipoCarrito = {
-    agregarProducto: function(producto){
-      if(!this.productos){
-       this.productos = [producto]
-      } else {
-       this.productos.push(producto);
-      }
-    },
-    obtenerPrecioTotal: function(){
-      return this.productos.reduce((total, p) => total + p.precio, 0);
-    },
-    folio:getRandomInt(),
-    obtenerPrecioTotal: function(){
-        return this.productos.reduce((total, p) => total + p.precio, 0);
-      },
-    
-  }
-
- 
-
-closeCar.addEventListener("click",()=>{
-    
-   obtenerPrecioTotal()
-   
-
-});
-
-
-
-
-
-
-  
-
-
-
-
-
+  return Math.floor(Math.random() * max);
+}
